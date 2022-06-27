@@ -1,0 +1,16 @@
+@charset "UTF-8";
+
+.profileDiv {
+	width: 300px;
+	height: 300px;
+	border: 1px solid skyblue;
+	border-radius: 35%;
+	overflow: hidden;
+	margin: auto;
+}
+
+.profilePic {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
