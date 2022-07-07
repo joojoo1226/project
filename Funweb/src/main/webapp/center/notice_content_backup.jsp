@@ -5,7 +5,7 @@
 <%
 // idx, pageNum 가져오기
 int idx = Integer.parseInt(request.getParameter("idx"));
-// String pageNum = request.getParameter("pageNum");
+String pageNum = request.getParameter("pageNum");
 
 // if(pageNum == null) {
 // 	pageNum = "1";
@@ -21,8 +21,6 @@ dao.updateReadcount(idx);
 // BoardDAO 객체의 selectBoard() 메서드를 호출하여 게시물 1개 정보 조회
 // => 파라미터 : 글번호(idx), 리턴타입 : BoardDTO(board)
 BoardDTO board = dao.selectBoard(idx);
-
-pageContext.setAttribute("board", board);
 %>	
 <!DOCTYPE html>
 <html>
@@ -57,29 +55,29 @@ pageContext.setAttribute("board", board);
 			<table id="notice">
 				<tr>
 					<td>글번호</td>
-					<td>${board.idx }</td>
+					<td><%=board.getIdx() %></td>
 					<td>글쓴이</td>
-					<td>${board.name }</td>
+					<td><%=board.getName() %></td>
 				</tr>
 				<tr>
 					<td>작성일</td>
-					<td>${board.date }</td>
+					<td><%=board.getDate() %></td>
 					<td>조회수</td>
-					<td>${board.readcount }</td>
+					<td><%=board.getReadcount() %></td>
 				</tr>
 				<tr>
 					<td>제목</td>
-					<td colspan="3">${board.subject }</td>
+					<td colspan="3"><%=board.getSubject() %></td>
 				</tr>
 				<tr>
 					<td>내용</td>
-					<td colspan="3">${board.content }</td>
+					<td colspan="3"><%=board.getContent() %></td>
 				</tr>
 			</table>
 			<div id="table_search">
-				<input type="button" value="글수정" class="btn" onclick="location.href='notice_update.jsp?idx=<%=idx%>&pageNum=${param.pageNum}'"> 
-				<input type="button" value="글삭제" class="btn" onclick="location.href='notice_delete.jsp?idx=<%=idx%>&pageNum=${param.pageNum}'"> 
-				<input type="button" value="글목록" class="btn" onclick="location.href='notice.jsp?pageNum=${param.pageNum}'">
+				<input type="button" value="글수정" class="btn" onclick="location.href='notice_update.jsp?idx=<%=idx%>&pageNum=<%=pageNum%>'"> 
+				<input type="button" value="글삭제" class="btn" onclick="location.href='notice_delete.jsp?idx=<%=idx%>&pageNum=<%=pageNum%>'"> 
+				<input type="button" value="글목록" class="btn" onclick="location.href='notice.jsp?pageNum=<%=pageNum%>'">
 			</div>
 
 			<div class="clear"></div>

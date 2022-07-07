@@ -145,8 +145,8 @@ public class BoardDAO {
 	// 게시물 목록을 조회하는 selectBoardList() 메서드 정의
 	// => 파라미터 : 현재 페이지 번호, 페이지 당 게시물 수
 	// => 리턴타입 : List(ArrayList 객체)
-	public List selectBoardList(int pageNum, int listLimit) {
-		List boardList = null;
+	public List<BoardDTO> selectBoardList(int pageNum, int listLimit) {
+		List<BoardDTO> boardList = null;
 		
 		// 현재 페이지 번호를 활용하여 조회 시 시작행 번호 계산
 		int startRow = (pageNum - 1) * listLimit;
@@ -165,7 +165,7 @@ public class BoardDAO {
 			rs = pstmt.executeQuery();
 			
 			// 전체 게시물 목록을 저장할 List(ArrayList) 객체 생성
-			boardList = new ArrayList(); // ArrayList -> List 업캐스팅
+			boardList = new ArrayList<BoardDTO>(); // ArrayList -> List 업캐스팅
 			
 			while(rs.next()) {
 				// 1개 게시물(레코드)을 저장할 BoardDTO 객체 생성
@@ -193,9 +193,9 @@ public class BoardDAO {
 		return boardList;
 	}
 	
-	public List selectBoardList(String searchField, String keyword, int pageNum, int listLimit) {
+	public List<BoardDTO> selectBoardList(String searchField, String keyword, int pageNum, int listLimit) {
 		
-		List boardList = null;
+		List<BoardDTO> boardList = null;
 		
 		// 현재 페이지 번호를 활용하여 조회 시 시작행 번호 계산
 		int startRow = (pageNum - 1) * listLimit;
@@ -227,7 +227,7 @@ public class BoardDAO {
 			rs = pstmt.executeQuery();
 			
 			// 전체 게시물 목록을 저장할 List(ArrayList) 객체 생성
-			boardList = new ArrayList(); // ArrayList -> List 업캐스팅
+			boardList = new ArrayList<BoardDTO>(); // ArrayList -> List 업캐스팅
 			
 			while(rs.next()) {
 				// 1개 게시물(레코드)을 저장할 BoardDTO 객체 생성

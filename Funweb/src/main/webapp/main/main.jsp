@@ -23,7 +23,7 @@
 		<div class="clear"></div>   
 		<!-- 본문들어가는 곳 -->
 		<!-- 메인 이미지 -->
-		<div id="main_img"><img src="../images/main_img.jpg"></div>
+		<div id="main_img"><img src="../images/main_img.jpg" width="100%" height="100%"></div>
 		<!-- 본문 내용 -->
 		<article id="front">
 		  	<div id="solution">

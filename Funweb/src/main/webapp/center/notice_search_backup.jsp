@@ -3,7 +3,6 @@
 <%@page import="board.BoardDAO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
 // 검색어(keyword) 가져오기
 String keyword = request.getParameter("keyword");
@@ -37,9 +36,7 @@ if(endPage > maxPage) {
 	endPage = maxPage;
 }
 
-List<BoardDTO> boardList = dao.selectBoardList(searchField, keyword, pageNum, listLimit);
-
-pageContext.setAttribute("boardList", boardList);
+List boardList = dao.selectBoardList(searchField, keyword, pageNum, listLimit);
 %>    
 <!DOCTYPE html>
 <html>
@@ -78,16 +75,29 @@ pageContext.setAttribute("boardList", boardList);
 					<th class="tdate">Date</th>
 					<th class="tread">Read</th>
 				</tr>
-				<c:forEach var="board" items="${boardList }">
-					<tr onclick="location.href='notice_content.jsp?idx=${board.idx }&pageNum=<%=pageNum%>'">
-						<td>${board.idx }</td>
-						<td class="left">${board.subject }</td>
-						<td>${board.name }</td>
-						<td>${board.date }</td>
-						<td>${board.readcount }</td>
-					</tr>
-				</c:forEach>
+				<%-- 실제 게시물 목록이 표시될 위치 --%>
+				<%
+// 				for(int i = 0; i < boardList.size(); i++) {
+// 					Object o = boardList.get(i);
+					
+// 				}
 				
+				// 향상된 for문 사용 시
+				for(Object o : boardList) {
+// 					o.getIdx(); // 오류 발생! 업캐스팅 된 객체는 슈퍼클래스의 멤버만 접근 됨
+					// => 따라서, BoardDTO 타입(서브클래스)으로 다운캐스팅 후에 사용해야한다!
+					BoardDTO board = (BoardDTO)o; // Object -> BoardDTO 다운캐스팅
+					%>
+					<tr onclick="location.href='notice_content.jsp?idx=<%=board.getIdx()%>&pageNum=<%=pageNum%>'">
+						<td><%=board.getIdx() %></td>
+						<td class="left"><%=board.getSubject() %></td>
+						<td><%=board.getName() %></td>
+						<td><%=board.getDate() %></td>
+						<td><%=board.getReadcount() %></td>
+					</tr>
+					<%
+				}
+				%>
 			</table>
 			<div id="table_search">
 				<input type="button" value="글쓰기" class="btn" 

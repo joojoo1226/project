@@ -1,16 +1,31 @@
 @charset "UTF-8";
 
-.profileDiv {
-	width: 300px;
-	height: 300px;
-	border: 1px solid skyblue;
+#imageDiv {
+	width: 45%;
+/* 	height: 200px; */
 	border-radius: 35%;
 	overflow: hidden;
 	margin: auto;
+	position: relative;
+	float: left;
 }
-
-.profilePic {
+.profileImg {
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
 }
+
+#infoDiv {
+	position: relative;
+	float: right;
+	width: 50%;
+	margin: auto;
+}
+
+.info_title {
+	font-family: fantasy;
+	font-size: 24px;
+	text-align: left;
+	letter-spacing: 1.5px;
+}
+

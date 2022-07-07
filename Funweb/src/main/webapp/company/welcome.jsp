@@ -30,18 +30,21 @@
 		<!-- 본문 내용 -->
 		<article>
 			<h1>Welcome</h1>
-			<!--
-			<figure class="ceo">
-				<img src="../images/company/ceo.jpg">
-				<figcaption>Fun Web CEO RYAN</figcaption>
-			</figure>
-			-->
 
-			<div class="profileDiv">
-				<img class="profilePic" src="../images/company/ss.jpg">
+			<div id="imageDiv">
+				<img class="profileImg" src="../images/company/ss.jpg">
 			</div>
-			<h3 style="text-align: center">Hi🥰</h3>
-			
+			<div id="infoDiv">
+				<span class="info_title">Name</span><br><br>
+				<span class="info_title">E-mail</span><br><br>
+				<span class="info_title">Phone</span><br><br>
+			</div>
+			<div id="skillDiv">
+			</div>
+			<div id="toolDiv">
+			</div>
+			<div id="activityDiv">
+			</div>
 		</article>
 		
 		<div class="clear"></div>

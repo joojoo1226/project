@@ -3,6 +3,7 @@
 <%@page import="board.BoardDAO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
 BoardDAO dao = new BoardDAO();
 //-------------------------------------------------------------------------------------
@@ -50,7 +51,9 @@ if(endPage > maxPage) {
 // => 파라미터 : 현재 페이지 번호, 페이지 당 게시물 수    리턴타입 : java.util.List
 // 조회 시 시작 게시물 번호(LIMIT 절에 사용할 시작 레코드(행) 번호) 계산
 // => 공식 : (현재페이지번호 - 1) * 페이지 당 게시물 수
-List boardList = dao.selectBoardList(pageNum, listLimit);
+List<BoardDTO> boardList = dao.selectBoardList(pageNum, listLimit);
+
+pageContext.setAttribute("boardList", boardList);
 %>	
 <!DOCTYPE html>
 <html>
@@ -89,29 +92,17 @@ List boardList = dao.selectBoardList(pageNum, listLimit);
 					<th class="tdate">Date</th>
 					<th class="tread">Read</th>
 				</tr>
-				<%-- 실제 게시물 목록이 표시될 위치 --%>
-				<%
-// 				for(int i = 0; i < boardList.size(); i++) {
-// 					Object o = boardList.get(i);
-					
-// 				}
 				
-				// 향상된 for문 사용 시
-				for(Object o : boardList) {
-// 					o.getIdx(); // 오류 발생! 업캐스팅 된 객체는 슈퍼클래스의 멤버만 접근 됨
-					// => 따라서, BoardDTO 타입(서브클래스)으로 다운캐스팅 후에 사용해야한다!
-					BoardDTO board = (BoardDTO)o; // Object -> BoardDTO 다운캐스팅
-					%>
-					<tr onclick="location.href='notice_content.jsp?idx=<%=board.getIdx()%>&pageNum=<%=pageNum%>'">
-						<td><%=board.getIdx() %></td>
-						<td class="left"><%=board.getSubject() %></td>
-						<td><%=board.getName() %></td>
-						<td><%=board.getDate() %></td>
-						<td><%=board.getReadcount() %></td>
+				<c:forEach var="board" items="${boardList }">
+					<tr onclick="location.href='notice_content.jsp?idx=${board.idx }&pageNum=${param.pageNum }'">
+						<td>${board.idx }</td>
+						<td class="left">${board.subject }</td>
+						<td>${board.name }</td>
+						<td>${board.date }</td>
+						<td>${board.readcount }</td>
 					</tr>
-					<%
-				}
-				%>
+				</c:forEach>
+				
 			</table>
 			<div id="table_search">
 				<input type="button" value="글쓰기" class="btn" 

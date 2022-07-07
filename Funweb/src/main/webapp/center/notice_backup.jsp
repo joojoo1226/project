@@ -2,22 +2,16 @@
 <%@page import="java.util.List"%>
 <%@page import="board.BoardDAO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+	pageEncoding="UTF-8"%>
 <%
-// 검색어(keyword) 가져오기
-String keyword = request.getParameter("keyword");
-String searchField = request.getParameter("searchField");
-
-// BoardDAO 객체의 selectBoardList() 메서드를 호출하여 게시물 조회
-// => 단, 메서드 오버로딩을 통해 동일한 이름으로 검색어를 포함하는 메서드 호출 
-// => 파라미터 : 검색어, 현재 페이지 번호, 페이지 당 게시물 수
-// => 리턴타입 : List(ArrayList 객체)
 BoardDAO dao = new BoardDAO();
+//-------------------------------------------------------------------------------------
+//BoardDAO 객체의 selectListCount() 메서드를 호출하여 전체 게시물 수 조회
+//=> 페이지 목록 계산에 필요
+int listCount = dao.selectListCount();
+// out.println("게시물 수 : " + listCount);
 
-int listCount = dao.selectListCount(searchField, keyword);
-out.println("게시물 수  : " + listCount);
-
+//페이징 처리에 사용될 변수 선언
 int pageNum = 1; // 현재 페이지 번호(기본값 1 페이지로 설정)
 int listLimit = 10; // 한 페이지 당 표시할 게시물 수
 int pageLimit = 10; // 한 페이지 당 표시할 페이지 목록 수
@@ -26,21 +20,38 @@ int pageLimit = 10; // 한 페이지 당 표시할 페이지 목록 수
 if(request.getParameter("pageNum") != null) {
 	pageNum = Integer.parseInt(request.getParameter("pageNum")); // String -> int 변환
 }
-
+//-------------------------------------------------------------------------------------
+//페이징 처리를 위한 계산 작업
+//1. 현재 페이지에서 표시할 전체 페이지 수 계산
+//=> 총 게시물 수 / 페이지 당 표시할 게시물 수
+//=> 주의! 총 게시물 수 / 페이지 당 표시할 게시물 수 연산 시 int / int = int 이므로
+// 나머지 값을 실수로 계산되게 하려면 double 타입 연산 필요함
+// (즉, 최소 하나의 값을 double 타입으로 변환 후 나눗셈 연산 수행)
+//=> 계산 결과를 소수점 첫째자리에서 올림 처리를 위해 0.9 더하기
+// ex) 4.5 일 경우 1 페이지가 더 필요하므로 5.x 가 되어야 함(x.1 ~ x.9 까지 + 0.9)
+//=> 올림 처리된 값을 정수화를 통해 실수 제거
+//int maxPage = (int)((double)listCount / listLimit + 0.9);
+//java.lang.Math 클래스의 ceil() 메서드를 사용하여 올림 처리 가능
 int maxPage = (int)Math.ceil((double)listCount / listLimit);
 
+//2. 현재 페이지에서 보여줄 시작 페이지 번호(1, 11, 21 등의 시작 번호) 계산
 int startPage = ((int)((double)pageNum / pageLimit + 0.9) - 1) * pageLimit + 1;
 
+//3. 현재 페이지에서 보여줄 끝 페이지 번호(10, 20, 30 등의 끝 번호) 계산
 int endPage = startPage + pageLimit - 1;
 
+//4. 만약, 끝 페이지(endPage)가 현재 페이지에서 표시할 총 페이지 수(maxPage)보다 클 경우
+// 끝 페이지 번호를 총 페이지 수로 대체
 if(endPage > maxPage) {
 	endPage = maxPage;
 }
-
-List<BoardDTO> boardList = dao.selectBoardList(searchField, keyword, pageNum, listLimit);
-
-pageContext.setAttribute("boardList", boardList);
-%>    
+//-------------------------------------------------------------------------------------
+// BoardDAO 객체의 selectBoardList() 메서드 호출
+// => 파라미터 : 현재 페이지 번호, 페이지 당 게시물 수    리턴타입 : java.util.List
+// 조회 시 시작 게시물 번호(LIMIT 절에 사용할 시작 레코드(행) 번호) 계산
+// => 공식 : (현재페이지번호 - 1) * 페이지 당 게시물 수
+List boardList = dao.selectBoardList(pageNum, listLimit);
+%>	
 <!DOCTYPE html>
 <html>
 <head>
@@ -78,16 +89,29 @@ pageContext.setAttribute("boardList", boardList);
 					<th class="tdate">Date</th>
 					<th class="tread">Read</th>
 				</tr>
-				<c:forEach var="board" items="${boardList }">
-					<tr onclick="location.href='notice_content.jsp?idx=${board.idx }&pageNum=<%=pageNum%>'">
-						<td>${board.idx }</td>
-						<td class="left">${board.subject }</td>
-						<td>${board.name }</td>
-						<td>${board.date }</td>
-						<td>${board.readcount }</td>
-					</tr>
-				</c:forEach>
+				<%-- 실제 게시물 목록이 표시될 위치 --%>
+				<%
+// 				for(int i = 0; i < boardList.size(); i++) {
+// 					Object o = boardList.get(i);
+					
+// 				}
 				
+				// 향상된 for문 사용 시
+				for(Object o : boardList) {
+// 					o.getIdx(); // 오류 발생! 업캐스팅 된 객체는 슈퍼클래스의 멤버만 접근 됨
+					// => 따라서, BoardDTO 타입(서브클래스)으로 다운캐스팅 후에 사용해야한다!
+					BoardDTO board = (BoardDTO)o; // Object -> BoardDTO 다운캐스팅
+					%>
+					<tr onclick="location.href='notice_content.jsp?idx=<%=board.getIdx()%>&pageNum=<%=pageNum%>'">
+						<td><%=board.getIdx() %></td>
+						<td class="left"><%=board.getSubject() %></td>
+						<td><%=board.getName() %></td>
+						<td><%=board.getDate() %></td>
+						<td><%=board.getReadcount() %></td>
+					</tr>
+					<%
+				}
+				%>
 			</table>
 			<div id="table_search">
 				<input type="button" value="글쓰기" class="btn" 
@@ -109,7 +133,7 @@ pageContext.setAttribute("boardList", boardList);
 			<div class="clear"></div>
 			<div id="page_control">
 				<%if(pageNum > 1) { %>
-					<a href="notice_search.jsp?pageNum=<%=pageNum - 1 %>">Prev</a>
+					<a href="notice.jsp?pageNum=<%=pageNum - 1 %>">Prev</a>
 				<%} else { %>
 					<a onclick="">Prev</a>
 				<%} %>
@@ -120,12 +144,12 @@ pageContext.setAttribute("boardList", boardList);
 					<%if(pageNum == i) { %>
 						<a onclick=""><%=i %></a>
 					<%} else { %>
-						<a href="notice_search.jsp?pageNum=<%=i %>"><%=i %></a>
+						<a href="notice.jsp?pageNum=<%=i %>"><%=i %></a>
 					<%} %>
 				<%} %>
 				
 				<%if(pageNum < endPage) { %>
-					<a href="notice_search.jsp?pageNum=<%=pageNum + 1%>">Next</a>
+					<a href="notice.jsp?pageNum=<%=pageNum + 1%>">Next</a>
 				<%} else { %>
 					<a onclick="">Next</a>
 				<%} %>
@@ -139,7 +163,5 @@ pageContext.setAttribute("boardList", boardList);
 	</div>
 </body>
 </html>
-
-
 
 
